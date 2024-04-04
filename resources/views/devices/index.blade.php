@@ -66,7 +66,8 @@
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table class="table table-bordered align-middle nowrap">
+                                <table class="table table-bordered align-middle nowrap" style="text-align: center;">
+
                                         <thead>
                                             <tr>
                                                 <th scope="col">No</th>

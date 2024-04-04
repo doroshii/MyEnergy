@@ -46,11 +46,12 @@
                                                                         <div class="dropdown-menu dropdown-menu-end">                                                         
                                                                             <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editBuildingModal{{ $building->id }}">Edit</a>                                                                   
                                                                             <div class="dropdown-divider"></div>               
-                                                                            <form action="{{ route('buildings.destroy', $building->id) }}" method="POST">
+                                                                            <form action="{{ route('buildings.destroy', $building->id) }}" method="POST" id="deleteForm{{$building->id}}">
                                                                                 @csrf
                                                                                 @method('DELETE')
-                                                                                <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Are you sure you want to delete this building?')">Remove</button>
+                                                                                <button type="button" class="dropdown-item text-danger delete-building-btn" data-building-id="{{ $building->id }}">Remove</button>
                                                                             </form>
+
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -198,6 +199,28 @@
         return new bootstrap.Tooltip(tooltipTriggerEl)
     })
 
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle click event on delete button
+        $('.delete-building-btn').on('click', function () {
+            var buildingId = $(this).data('building-id');
+            // Show SweetAlert confirmation dialog
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You won\'t be able to revert this!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If user confirms deletion, submit the form
+                    $('#deleteForm'+buildingId).submit();
+                }
+            });
+        });
+    });
+
     $(document).ready(function() {
         $('#addBuildingForm').on('submit', function(e) {
             e.preventDefault();
@@ -219,5 +242,29 @@
         });
     });
 
+    $(document).ready(function() {
+        $('#editBuildingForm').on('submit', function(e) {
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#editBuildingModal').modal('hide');
+                    // Display SweetAlert for success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.success,
+                    });
+                    // You may need to reload the building list here
+                },
+                error: function(error) {
+                    console.log(error);
+                    // Handle errors here
+                }
+            });
+        });
+    });
 </script>
 @endsection
